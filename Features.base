@@ -1,0 +1,16 @@
+views:
+  - type: table
+    name: Table
+    filters:
+      and:
+        - file.hasTag("Algorithmes", "Communauté", "UX", "core_features")
+    order:
+      - file.name
+      - tags
+      - file.backlinks
+      - Spec rédigée
+    sort:
+      - property: file.embeds
+        direction: DESC
+  - type: table
+    name: View
