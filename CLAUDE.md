@@ -8,3 +8,5 @@ Pour l'instant le dossier de spec ignore les aspects monétaires.
 Fait bien attention au fait que je suis revenu sur certaines features, je l'écrit en italique en commentaire, je ne veux pas les mentionner dans les specs. 
 
 A chaque réponse, prends bien le temps de te remémorer absolument toutes les features que je souhaite ajouter dans le projet (dossier Features) pour me faire les meilleurs suggestions d'ajouts / d'amélioration. 
+
+Si quelques choses de techniquement similaire (pas forcément sur la thématique éducation) suggère le moi. 
