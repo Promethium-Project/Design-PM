@@ -2,7 +2,7 @@
 
 On peut utliser l'API de MathPix (utilisée par Notion)
 -> c'est lui qu'il faut pour du manuscrit 
--> par contre on peut peut-être s'en sortir avec d'autres modèles poru du PDF par exemple
+-> par contre on peut peut-être s'en sortir avec d'autres modèles pour du PDF par exemple
 
 
 Le PDF s'ouvre instantanément, par contre en asynchrone, on lance le traitement. 

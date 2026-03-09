@@ -5,6 +5,8 @@ tags:
 Cette idée de dire il n'y a plus de folder et de dossier que des dossiers
 Enfaite un folder c'est un noeud
 **C'est encore a bien creuser !!!** **TO DO**
+
+_Je suis revenu là dessus je ne veux plus parler en node__
 # Feature Spec — Nœud Composite & DisplayTemplate
 
 **Dépendances :** 
