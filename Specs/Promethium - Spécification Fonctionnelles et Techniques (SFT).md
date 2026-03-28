@@ -133,14 +133,16 @@ Les killer features sont :
 ### 1.2.2 Analyse concurrentielle
 
 - **Applications de prise de note privacy first avec du bidirectional linking :**
-	- **Obsidian :** Sur le plan de l'UX, c'est le plus gros concurrent. Obsidian est très modulaire : et c'est ce qu'il faut garder dans PM le plus possible. Certes on part de besoin spécifiques (la classe préparatoire) mais les objets que l'on crée doivent rester très généraux pour être appliqués à d'autre domaines. Le problème de l'application est que elle n'arrive pas à briser la frontière entre papier et numérique. La gestion de l'OCR, et de mécanisme d'UX pour fondre notes numériques / notes manuscrites.
+	- **Obsidian :** Sur le plan de l'UX, c'est le plus gros concurrent. Obsidian est très modulaire : et c'est ce qu'il faut garder dans PM le plus possible. Certes on part de besoin spécifiques (la classe préparatoire) mais les objets que l'on crée doivent rester très généraux pour être appliqués à d'autre domaines (faculté, universités étrangères, médcine...). Les deux problèmes de l'application sont :
+		-  Elle n'arrive pas à briser la frontière entre papier et numérique. La gestion de l'OCR, et de mécanisme d'UX pour fondre notes numériques / notes manuscrites.
+		-  Elle ne donne pas une bonne UX pour la collaboration. 
 	- **Roam Research & Logseq** : ces applications ont été tuées par Obsidian, donc cf ci-dessus.
 
 
 - **Applications de prises de notes :**
 	- **Amphi :** L'app est à ce jour bugée, mets en exergue la difficulté de créer une app de prise de note manuscrite. Ce qui manque c'est la gestion de la communication entre un Drive et la structuration des données manuscrites. Mais l'aspect interface modulaire est aussi très bon. 
 
-- **Mathraining** : Le côté compétitif est ici une redondance. Tous ne veulent pas s'engager dans la compétition. Par ailleurs la classe préparatoire introduit déjà la compétition. PM vise à être un outil de support, pas l'instance qui orchestre la compétition entre les utilisateurs. Le ranking des utilisateurs ne sert ici 
+- **Mathraining** : Le côté compétitif est ici une redondance. Tous ne veulent pas s'engager dans la compétition. Par ailleurs la classe préparatoire introduit déjà la compétition. PM vise à être un outil de support, pas l'instance qui orchestre la compétition entre les utilisateurs. La compétition sur PM doit être une feature émergente (exemple les users créent un Excel dans un repo pour faire un classement). 
 
 - **Github :** Ne pourrait pas être utilisé pour ce cas d'usage car n'a pas assez de verticales pour gérer les formats de documents hétérogènes et n'abstrait pas assez la complexité de git avec une bonne UX, ce qui est essentiel pour les étudiants qui n'ont pas le temps d'intégrer ce type de complexité et doivent aller droit au but. 
 

@@ -1,6 +1,6 @@
 {
 	"nodes":[
-		{"id":"c64728bf7d5223d6","type":"file","file":"Supérieur/Design PM/Core Technical Features/modele_de_donnee.excalidraw.md","x":-68,"y":541,"width":400,"height":400},
+		{"id":"c64728bf7d5223d6","type":"file","file":"Supérieur/Design PM/Core Technical Features/modele_de_donnee.excalidraw.md","x":-68,"y":541,"width":400,"height":299},
 		{"id":"c638db9e3c251a1c","type":"text","text":"# Workflow autour de l'exercice","x":-125,"y":-30,"width":525,"height":70}
 	],
 	"edges":[

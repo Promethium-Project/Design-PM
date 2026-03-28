@@ -1,269 +1,173 @@
-Demande la permission avant de modifier des fichiers, de préférence ne supprime rien, ne modifie rien. Juste ajoute éventuellement
+## Règles
 
-Tu dois me challenger pour que mon document de spec soit le plus précis possible, parfois insister même quand je te contredis. 
+1. **Régle d'or : à chaque fois que je te fais un retour / précise ma vision pour ce projet, update ce document CLAUDE.MD**
+2. Tu n'as pas la permission de modifier / supprimer des documents de ce dossier. Lecture seule.
+3. À chaque réponse, relis mentalement toutes les features du dossier `Features/` pour faire les meilleures suggestions d'ajouts / d'amélioration.
+4. Challenger Julien pour que les specs soient précises — insister même quand elle contredit.
 
-Pour l'instant le dossier de spec ignore les aspects monétaires. 
+## Informations complémentaires
 
-Fait bien attention au fait que je suis revenu sur certaines features, je l'écrit en italique en commentaire, je ne veux pas les mentionner dans les specs. 
+- Les aspects monétaires sont volontairement ignorés dans les specs pour l'instant.
+- Les features en *italique commenté* dans les docs = abandonnées, ne pas les mentionner dans les specs.
+- Si quelque chose de techniquement similaire existe hors éducation, le signaler.
+- Tu as accès à un tool pour lire les fichiers Excalidraw visuellement — utilise-le systématiquement.
 
-A chaque réponse, prends bien le temps de te remémorer absolument toutes les features que je souhaite ajouter dans le projet (dossier Features) pour me faire les meilleurs suggestions d'ajouts / d'amélioration. 
+---
 
-Si quelques chose de techniquement similaire (pas forcément sur la thématique éducation) suggère le moi. 
+## Contexte du projet : Prométhium (PM)
 
-Pour lire les fichiers excalidraw, je veux que tu le fasse visuellement. tu as accès à un tool : 
+### Vision
 
-## excalidraw-to-image` — Read wireframes
+**Prométhium** est une _everything app_ pour étudiants en prépa scientifique. Inspirée d'Obsidian (modulaire, tout au clavier) mais construite pour les usages spécifiques des études scientifiques.
 
-Converts an Excalidraw file to PNG.
+**4 problèmes résolus :**
+1. Difficulté à coopérer sans friction (compétition + manque de temps en prépa)
+2. Manque d'optimisation data-driven des parcours d'étude
+3. Rétention des ressources pédagogiques par les établissements (problème de théorie des jeux)
+4. Fragmentation des workflows (cours papier, PDFs, Anki, échanges...)
 
-```bash
-excalidraw-to-image <file.excalidraw.md> [-o output.png]
+**Métriques cibles :** quantité d'exercices travaillés, interactions productives entre pairs, temps d'organisation réduit.
+
+**Audiences :** élèves de prépa scientifique (cible principale), professeurs, établissements.
+
+---
+
+### Principe fondamental : tout est un fichier
+
+**Abandon de l'abstraction "Node".** Tout contenu est un fichier dans un repo git. Les métadonnées vont dans le frontmatter. Le graphe émerge des liens entre fichiers.
+
+Les types de fichiers principaux :
+- **Ressource** (`.md` avec frontmatter `type: td | lesson | exercise | course`) — contenu du prof
+- **Anchor** (`.anchor.md` ou `.anchor.json`) — overlay de l'étudiant/guilde sur une ressource
+- **Link** (`.link.md`) — lien typé entre deux ressources sans position (prérequis, références...)
+- **Binaires** (`.pdf`, `.mp4`, `.png`) — ressources non-markdown (voir Q1 non résolue)
+
+**Insight central : toute feature sociale est un Anchor.** Il n'y a pas de système social "en plus".
+
+Exemple de ressource :
+```markdown
+---
+type: td
+title: TD Algèbre Linéaire 1
+prerequisites:
+  - ../cours/algebre-lineaire-1.md
+tags: [algèbre, L1]
+---
 ```
 
-| Flag | Description | Default |
-|------|-------------|---------|
-| `-o <path>` | Output PNG path | Same name as input with `.png` |
-| `-h, --help` | Show help | |
-
-**Supported input formats:**
-
-| Format | Description |
-|--------|-------------|
-| `.excalidraw.md` | Obsidian Excalidraw plugin (compressed JSON in Markdown) |
-| `.excalidraw` | Plain Excalidraw JSON |
-
-**Examples:**
-
-```bash
-excalidraw-to-image "Login Flow.excalidraw.md"
-excalidraw-to-image "Login Flow.excalidraw.md" -o "/tmp/preview.png"
+Exemple d'anchor (overlay étudiant sur une ressource prof) :
+```markdown
+---
+type: anchor
+anchor_type: note | definition | anki | forum | guild_annotation | signet | erratum
+source:
+  file: <URI vers le fichier prof — format non résolu, voir Q3>
+  commit: sha1:b3e7f1
+  position:
+    kind: pdf | text | video | ocr
+    text_snapshot: "Soit E un espace vectoriel"
+target:
+  file: notes/td1-notes.md
+  block_id: bloc-42
+layer: personal | guild
+author: did:key:pubkey
+---
 ```
 
 ---
 
-## `excalidraw-draw` — Create wireframes
+### Architecture décentralisée
 
-Generates a `.excalidraw` file from a JSON spec. The output can be opened in Obsidian/Excalidraw or converted to PNG with `excalidraw-to-image`.
+Chaque utilisateur et chaque prof a son **propre repo git**. Les overlays (anchors, links communautaires) vivent dans les repos de leurs auteurs — ils ne modifient jamais le repo source.
 
-```bash
-excalidraw-draw <spec.json> [-o output.excalidraw]
-excalidraw-draw --inline '<json>' [-o output.excalidraw]
+```
+Repo du prof      Repo étudiant (overlay)    Repo guilde (overlay)
+  td1.md    ←──────  .anchor/td1-note.md  ←── .anchor/td1-guild.md
+  cours1.md          .link/prereq.md
 ```
 
-| Flag | Description | Default |
-|------|-------------|---------|
-| `-o <path>` | Output `.excalidraw` path | Same name as input with `.excalidraw` |
-| `--inline <json>` | Pass spec as a JSON string instead of a file | |
-| `-h, --help` | Show help | |
+**Stale detection** : chaque anchor stocke le `commit` du fichier source au moment de sa création. Quand le client détecte un nouveau commit dans le repo du prof, il compare localement — sans serveur central.
 
-### Spec format
+**Reverse lookup** (trouver tous les overlays sur un fichier source) :
+- Overlays personnels : triviaux, repo local
+- Overlays de guilde : repos des guildes dont on est membre
+- Overlays publics (forum, errata) : relay avec index `source_file → [anchor_ids]` ou AppView d'établissement
 
-```json
-{
-  "background": "#ffffff",
-  "elements": [
-    { "type": "rectangle", "x": 0,   "y": 0,   "width": 300, "height": 60,  "label": "Header" },
-    { "type": "ellipse",   "x": 0,   "y": 80,  "width": 60,  "height": 60  },
-    { "type": "diamond",   "x": 100, "y": 80,  "width": 100, "height": 60,  "label": "Decision?" },
-    { "type": "text",      "x": 0,   "y": 160, "text": "A note", "fontSize": 14 },
-    { "type": "arrow",     "x": 50,  "y": 60,  "points": [[0,0],[0,80]] },
-    { "type": "line",      "x": 0,   "y": 200, "points": [[0,0],[300,0]] },
-    { "type": "frame",     "x": 0,   "y": 0,   "width": 400, "height": 300, "label": "Screen A" }
-  ]
-}
-```
-
-### Supported element types
-
-| Type | Required fields | Notes |
-|------|----------------|-------|
-| `rectangle` | `x`, `y`, `width`, `height` | Add `label` for text inside |
-| `ellipse` | `x`, `y`, `width`, `height` | Add `label` for text inside |
-| `diamond` | `x`, `y`, `width`, `height` | Add `label` for text inside |
-| `text` | `x`, `y`, `text` | Standalone text, use `fontSize` to size |
-| `arrow` | `x`, `y`, `points` | `points` are relative to `x,y` — e.g. `[[0,0],[100,50]]` |
-| `line` | `x`, `y`, `points` | Same as arrow but no arrowhead |
-| `frame` | `x`, `y`, `width`, `height` | Named container, use `label` for the frame title |
-
-### Style properties (all optional)
-
-| Property | Values | Default |
-|----------|--------|---------|
-| `strokeColor` | Any hex color | `#1e1e1e` |
-| `backgroundColor` | Any hex color or `transparent` | `transparent` |
-| `fillStyle` | `solid`, `hachure`, `cross-hatch`, `dots` | `solid` |
-| `strokeWidth` | `1`, `2`, `4` | `2` |
-| `strokeStyle` | `solid`, `dashed`, `dotted` | `solid` |
-| `roughness` | `0` (clean), `1` (sketch), `2` (very rough) | `1` |
-| `opacity` | `0`–`100` | `100` |
-| `fontSize` | Number in px | `16` |
-| `fontFamily` | `1` (Virgil/handwritten), `2` (Helvetica), `3` (Cascadia/mono) | `1` |
-
-### Coordinate system
-
-Origin `(0, 0)` is top-left. `x` goes right, `y` goes down. Typical canvas sizes:
-- Mobile: 375 × 812
-- Desktop: 1280 × 800
-- Tablet: 768 × 1024
-
-### Example: full login screen
-
-```bash
-excalidraw-draw --inline '{
-  "elements": [
-    { "type": "text",      "x": 130, "y": 40,  "text": "Sign In", "fontSize": 28 },
-    { "type": "text",      "x": 40,  "y": 110, "text": "Email",   "fontSize": 14 },
-    { "type": "rectangle", "x": 40,  "y": 130, "width": 300, "height": 44, "roughness": 0, "backgroundColor": "#f8f8f8", "fillStyle": "solid" },
-    { "type": "text",      "x": 40,  "y": 200, "text": "Password","fontSize": 14 },
-    { "type": "rectangle", "x": 40,  "y": 220, "width": 300, "height": 44, "roughness": 0, "backgroundColor": "#f8f8f8", "fillStyle": "solid" },
-    { "type": "rectangle", "x": 40,  "y": 290, "width": 300, "height": 48, "roughness": 0, "backgroundColor": "#4361ee", "strokeColor": "#4361ee", "fillStyle": "solid", "label": "Log In" },
-    { "type": "text",      "x": 130, "y": 360, "text": "Forgot password?", "fontSize": 13, "strokeColor": "#4361ee" }
-  ]
-}' -o login.excalidraw
-
-excalidraw-to-image login.excalidraw -o login.png
-```
+**Chat** : ne rentre pas dans git. Modèle séparé — event stream append-only sur un relay. Le `Room ID` est un fichier `.md` dans le repo de la guilde qui pointe vers le relay. Deux usages distincts :
+- **Threads forum ancrés** (semi-persistants, liés à un doc) → fichier anchor dans le repo
+- **Chat temps réel / DMs** → relay event stream, hors git
 
 ---
 
-## Integration with Claude Code
+### Anchor System & Mapping
 
-Add this to your global `~/.claude/CLAUDE.md` (create if it doesn't exist):
+Infrastructure centrale reliant des positions précises entre documents hétérogènes (PDF, OCR, vidéo, texte riche).
 
-````markdown
-## Excalidraw tools
+- **3 modes de vue :** split-screen (travail), overlays (lecture), marginalia (révision)
+- **Layers :** personal / guild, togglables individuellement
+- **Stale-ité :** quand le prof fait un commit sur la source, les anchors peuvent ne plus correspondre → interface de révision diff côté client
+- **Clusters** : anchors superposés fusionnés en un marqueur cluster avec badge de compte
 
-Two commands are available globally: `excalidraw-to-image` and `excalidraw-draw`.
+Types d'anchor : `note`, `definition`, `anki`, `forum`, `guild_annotation`, `signet`, `erratum`, `intent`, `inferred_prerequisite`
 
----
-
-### Reading a file
-
-When the user mentions a `.excalidraw` or `.excalidraw.md` file, always:
-1. Run: `excalidraw-to-image "path/to/file.excalidraw.md" -o "/tmp/preview.png"`
-2. Read the PNG with the Read tool
-3. Never read the raw text of an Excalidraw file without rendering it first
-
-To zoom into a region of a large image, use Puppeteer to crop it:
-```javascript
-// node /tmp/crop.js
-const puppeteer = require('/path/to/excalidraw-to-image/node_modules/puppeteer');
-const fs = require('fs');
-const [cropX, cropY, cropW, cropH] = [0, 200, 800, 600]; // pixels on the full image
-(async () => {
-  const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
-  const page = await browser.newPage();
-  await page.setViewport({ width: cropW, height: cropH });
-  const b64 = fs.readFileSync('/tmp/preview.png').toString('base64');
-  await page.setContent(`<html><body style="margin:0;overflow:hidden">
-    <img src="data:image/png;base64,${b64}"
-         style="position:absolute;top:-${cropY}px;left:-${cropX}px">
-  </body></html>`);
-  await new Promise(r => setTimeout(r, 400));
-  fs.writeFileSync('/tmp/crop.png', await page.screenshot());
-  await browser.close();
-})();
-```
+Types de link (sans position) : `prerequisite`, `references`, `corrects`, `follows`, `generalizes`, `specializes`, `inferred_prerequisite`
 
 ---
 
-### Drawing
+### Features → primitives (résumé)
 
-**Workflow:**
-1. **Declare** in plain text what you are going to draw
-2. **Generate** the file:
-   ```bash
-   # Plain .excalidraw (for rendering)
-   excalidraw-draw --inline '<spec JSON>' -o "/tmp/drawing.excalidraw"
-   # Obsidian-compatible (openable directly in the vault)
-   excalidraw-draw --inline '<spec JSON>' -o "/path/to/vault/drawing.excalidraw.md"
-   ```
-3. **Render** to PNG:
-   ```bash
-   excalidraw-to-image "/tmp/drawing.excalidraw" -o "/tmp/drawing.png"
-   ```
-4. **Compare** with the Read tool — if the render does not match the declaration, fix the spec and regenerate
+| Feature | Implémentation |
+|---|---|
+| Notes de guilde | `.anchor.md` `guild_annotation`, layer `guild` |
+| Erratum | `.anchor.md` `erratum` + rendu conditionnel |
+| Questions / mini-forum | `.anchor.md` `forum` + fichier thread |
+| Signet | `.anchor.md` `signet`, layer `personal` |
+| Solutions | fichier `solution.md`, enfant du dossier exercice |
+| Tags hiérarchiques collaboratifs | fichiers `tag.md` versionnés git + service consensus |
+| Parcours recommandé | `.link.md` `inferred_prerequisite` + service ML |
+| Time tracker | service analytics séparé |
+| Intention de faire un exo | fichier `intent.md` + `.anchor.md` `intent` |
+| Chat de guilde | relay event stream (hors git) + `room.md` pointeur |
 
 ---
 
-### Spec format
+### Questions architecturales ouvertes
 
-```json
-{
-  "background": "#ffffff",
-  "elements": [
-    { "type": "rectangle", "x": 0,   "y": 0,   "width": 300, "height": 60, "label": "Header" },
-    { "type": "ellipse",   "x": 0,   "y": 80,  "width": 60,  "height": 60 },
-    { "type": "diamond",   "x": 100, "y": 80,  "width": 100, "height": 60, "label": "Decision?" },
-    { "type": "text",      "x": 0,   "y": 160, "text": "A note", "fontSize": 14 },
-    { "type": "arrow",     "x": 50,  "y": 60,  "points": [[0,0],[0,80]] },
-    { "type": "line",      "x": 0,   "y": 200, "points": [[0,0],[300,0]] },
-    { "type": "frame",     "x": 0,   "y": 0,   "width": 400, "height": 300, "label": "Section" }
-  ]
-}
-```
+**Q1 — Fichiers exotiques (PDF, vidéo)**
+Option A (sidecar) : `td1.pdf` + `td1.md` (fiche metadata à côté) vs Option B (wrapper) : `td1.md` avec `binary: ./td1.pdf` dans le frontmatter. **Non résolu.**
 
-**Element types:**
+**Q2 — Format des métadonnées d'anchor**
+Frontmatter YAML uniforme (verbeux pour les positions complexes) vs `.anchor.json` pour les anchors avec `bbox` / coordonnées. **Non résolu.**
 
-| Type | Required | Notes |
-|------|----------|-------|
-| `rectangle` | `x y width height` | `label` adds centered text inside |
-| `ellipse` | `x y width height` | `label` adds centered text inside |
-| `diamond` | `x y width height` | `label` adds centered text inside |
-| `text` | `x y text` | standalone text |
-| `arrow` | `x y points` | `points` are relative to `x,y` — e.g. `[[0,0],[100,50]]` |
-| `line` | `x y points` | same as arrow, no arrowhead |
-| `frame` | `x y width height` | named container, `label` sets the title |
+**Q3 — URI cross-repo**
+Comment un anchor étudiant pointe-t-il vers un fichier dans le repo du prof ? Chemin relatif (intra-repo seulement), URL git (couplé hébergeur), CID IPFS (content-addressed), ou `at://did:key:prof/...` (DID-based). **Non résolu.**
 
-**Style properties (all optional):**
-
-| Property | Values | Default |
-|----------|--------|---------|
-| `strokeColor` | any hex | `#1e1e1e` |
-| `backgroundColor` | any hex or `transparent` | `transparent` |
-| `fillStyle` | `solid` `hachure` `cross-hatch` `dots` | `solid` |
-| `strokeWidth` | `1` `2` `4` | `2` |
-| `strokeStyle` | `solid` `dashed` `dotted` | `solid` |
-| `roughness` | `0` clean · `1` sketch · `2` very rough | `1` |
-| `opacity` | `0`–`100` | `100` |
-| `fontSize` | px | `16` |
-| `fontFamily` | `1` Virgil (handwritten) · `2` Helvetica · `3` Cascadia (mono) | `1` |
-
-**Coordinate system:** origin (0,0) top-left, x → right, y → down.
-````
+**Q4 — DisplayTemplate**
+Avec l'abandon de Node, qui contrôle le rendu d'un fichier ? Convention de frontmatter ? Fichier de config par dossier ? Ou concept abandonné au profit de rendus fixes par `type` ? **Non résolu.**
 
 ---
 
-## Project structure
+### Git interne
 
-```
-├── cli.js                   # excalidraw-to-image entry point
-├── draw-cli.js              # excalidraw-draw entry point
-├── build-renderer.js        # esbuild script (runs on postinstall)
-├── src/
-│   ├── decompress.js        # LZ-string decompression (read)
-│   ├── render.js            # Puppeteer PNG rendering (read)
-│   ├── create.js            # Excalidraw element factory (draw)
-│   └── browser/
-│       └── renderer.js      # Browser-side export code (bundled)
-└── dist/
-    └── renderer.bundle.js   # Generated on install, do not commit
-```
+Chaque document/dossier est versionnable. Profs font des commits, élèves font des PRs (erratum, exercices d'oraux...). Export `.promethium` pour conserver les liens hors plateforme.
 
 ---
 
-## Troubleshooting
+### Architecture technique
 
-**`command not found`** — run `npm link` inside the project directory.
-
-**`Renderer bundle not found`** — run `npm run build` manually.
-
-**Slow first render** — Puppeteer initialises Chromium on the first call; subsequent runs are faster.
-
-**Text renders as boxes** — make sure `@excalidraw/excalidraw >= 0.18.0` is installed (`npm install` inside the project).
+- **Frontend** : Electron + React (SPA), pilotable au clavier, modulaire
+- **Backend** : microservices — analytics, recommandation ML, consensus de tags, événements (time tracker), relay chat
+- **Stack data** : repos git par utilisateur/guilde/prof, relay event streams pour le chat, AppView/index pour le reverse lookup des overlays publics
 
 ---
 
-## License
+### Fichiers clés
 
-MIT
+- `Specs/Promethium - Spécification Fonctionnelles et Techniques (SFT).md` — spec principale
+- `Core Technical Features/Mapping.md` — spec Anchor System complète
+- `Core Technical Features/Rapport — Implémentation des features sociales via Node + Anchor.md` — mapping features → primitives
+- `Core Technical Features/Système de tags.md` — tags collaboratifs
+- `Features/` — toutes les features individuelles
+- `Specs/` — specs détaillées et interfaces Excalidraw
+
+---
