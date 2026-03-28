@@ -1,4 +1,3 @@
-# Modèle de donnée v2 — Prométhium
 
 > Restructuration par rapport à v1 : séparation nette entre **infrastructure** (primitives, agnostique au contenu) et **protocole client** (conventions du client PM).
 

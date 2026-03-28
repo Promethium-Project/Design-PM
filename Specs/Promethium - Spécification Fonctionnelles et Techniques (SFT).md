@@ -138,7 +138,6 @@ Les killer features sont :
 		-  Elle ne donne pas une bonne UX pour la collaboration. 
 	- **Roam Research & Logseq** : ces applications ont été tuées par Obsidian, donc cf ci-dessus.
 
-
 - **Applications de prises de notes :**
 	- **Amphi :** L'app est à ce jour bugée, mets en exergue la difficulté de créer une app de prise de note manuscrite. Ce qui manque c'est la gestion de la communication entre un Drive et la structuration des données manuscrites. Mais l'aspect interface modulaire est aussi très bon. 
 
@@ -150,10 +149,9 @@ Les killer features sont :
 
 - **Notion :** Le logiciel n'a pas vocation à faire une percée dans le monde de l'éducation à cause de son format propriétaire qui est un frein à l'adoption énorme. Ce n'est pas assez modulaire. 
 
-	// Ce passage est mal placé 
 - **Forums prepa.org / mathématiques.net ... :** Quand un élève ne parvient pas à faire un exercice il a 2 solutions :
 	- Taper l'exercice sur internet et croiser les doigts pour le trouver. C'est chronophage.
-	- Demander à un LLM, mais il ne connait pas le contexte, les connaissances de l'élève, et ça casse fait une cassure.
+	- Demander à un LLM, mais il ne connait pas le contexte, les connaissances de l'élève, et ça casse fait une cassure dans son workflow.
 
 ## 1.3. Cas d'usage principaux 
 
@@ -170,12 +168,79 @@ Les killer features sont :
 # 2. Personas & Parcours utilisateur 
 
 ## 2.1. Personas
-- Elève : 
-- Professeur : 
+
+### 2.1.1 Élève de prépa scientifique 
+
+_TO DO : Dans cette partie il faudra ajouter des renvoies à la suite pour chaque friction / objectif que l'on résout_
+
+C'est la cible principale. C'est le persona dont on a la meilleure connaissance des besoins.
+C'est un profil motivé souvent à l'aise avec les outils numériques mais sans volonté d'y consacrer du temps d'apprentissage (il n'ira pas sur Github...). 
+
+Il jongle en permanence entre cours papier, PDFs, flashcards Anki, échanges WhatsApp et recherches web. On veut résoudre son problème de fragmentation. 
+
+Il est à la fois compétiteur (le classement compte) et conscient que la coopération peut l'aider — mais il n'a pas le temps de l'organiser, il faut que cela soit fait pour lui. 
+
+  **Objectifs :**
+  - Trouver rapidement les bons exercices pour progresser sur un point précis.
+  - Ne pas avoir à quitter son environnement de travail pour poser une question, chercher une correction ou faire une fiche.
+  - Savoir où il en est dans sa progression par rapport à ses objectifs et à ses camarades.
+  - Coopérer avec son groupe de travail sans friction de coordination.
+
+  **Points de friction actuels :**
+  - Les ressources sont éparpillées sur des drives privés, des groupes WhatsApp, des forums mal indexés.
+  - Il n'a aucun signal fiable pour savoir si un exercice est adapté à son niveau ou stratégiquement prioritaire.
+  - Passer d'un cours papier à ses notes numériques casse sa concentration.
+  - Aider un camarade coûte du temps et lui semble le désavantager dans la compétition.
+  - Constituer un deck Anki manuellement est trop chronophage pour être fait sérieusement.
+
+  **Valeur attendue de PM :**
+  - Un environnement unique qui absorbe PDF, cours manuscrits (OCR), vidéos et notes — sans jamais avoir à switcher d'outil.
+  - Des recommandations d'exercices basées sur les données réelles de progression de milliers d'élèves, pas sur l'intuition seule.
+  - Une couche sociale intégrée : poser une question ancrée précisément dans un document, voir les annotations de sa guilde, partager une solution sans sortir de son flux.
+  - La création rapide de flashcards depuis ses propres annotations sur un cours.
+  - Un time tracker comparatif pour calibrer ses sessions et identifier ses points de blocage.
+
+  **Critères de succès :**
+  - Il réalise plus d'exercices par session sans augmenter son temps de travail.
+  - Il a au moins une interaction productive avec un camarade à chaque session de travail.
+  - Il passe moins de 5 minutes par session à s'organiser (navigation, TODO, recherche de ressource).
+
+
+
+### 2.1.2 Professeur 
+
+C'est le profil qui a le plus grand levier de croissance pour ce projet : convaincre un professeur de premier plan d'utiliser l'outil pour son cours est une nécessité. 
+
+Un professeur a constitué au fil des années un corpus de TDs et d'exercices dont il est fier. Il adapte son cours chaque année à sa classe, mais cette adaptation repose sur son intuition — il sait que certains exercices font progresser, d'autres pas, mais n'a pas de données pour le valider. Il est **méfiant** vis-à-vis du partage de ses ressources, qu'il considère comme un **avantage concurrentiel pour ses élèves**.
+
+**Objectifs :**
+- Comprendre où ses élèves bloquent réellement, avec une granularité que les copies de colle ne lui donnent que sur une autre temporalité.
+- Améliorer l'ordre et la sélection de ses exercices en s'appuyant sur des données empiriques.
+- Maintenir son cours à jour et corriger les erreurs signalées par ses élèves efficacement.
+- Potentiellement, avoir de la visibilité sur la qualité de ses ressources comparées à celles d'autres établissements.
+
+**Points de friction actuels :**
+- Le seul signal de feedback qu'il reçoit est le classement annuel au concours — délai d'un an, signal agrégé et peu actionnable.
+- Il ne sait pas combien de temps ses élèves passent sur chaque exercice, ni lesquels ils abandonnent.
+- Les erratas et corrections remontent par email ou à l'oral, sans traçabilité.
+- Partager ses ressources revient à armer les établissements concurrents — c'est rationnel de ne pas le faire dans le
+système actuel.
+
+**Valeur attendue de PM :**
+- Des analytics granulaires sur l'usage de son cours : temps passé par section, taux de réussite par exercice, ordre empiriquement optimal.
+- Un flux de retours structurés de ses élèves (questions ancrées dans le document, errata proposés formellement).
+- Un système de versioning de ses ressources : commits pour affiner son cours, PRs pour intégrer les contributions de ses élèves (exercices d'oraux, corrections alternatives).
+- Un échange mutuellement avantageux : partager ses ressources lui donne accès à des données qu'il n'aurait jamais pu
+collecter seul.
+
+**Critères de succès :**
+- Il peut identifier en moins de 10 minutes les passages les plus bloquants d'un TD après une session de travail de sa classe.
+- Il reçoit et traite les errata de manière structurée, sans perte d'information.
+- Il perçoit la valeur du partage supérieure à la valeur de la rétention.
 
 ## 2.2. User journeys
 
-### 2.2.1 Un utilisateur qui travaille sur un cours 
+### 2.2.1 Un utilisateur qui travaille sur son propre cours 
 - OCR / Upload de PDF [[Supérieur/Design PM/Features/Gestion de l'OCR]]
 - Hover overlays pour avoir les variables 
 - Eventuellement intégration LLM 
