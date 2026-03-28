@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm:*)",
+      "Bash(find .git:*)",
+      "Bash(excalidraw-to-image \"C:\\\\Users\\\\julie\\\\Mon Drive\\\\MATHS Prepa\\\\Supérieur\\\\Design PM\\\\Core Technical Features\\\\Architecture TD v4.excalidraw\" -o \"/tmp/archi_v4.png\")",
+      "Bash(excalidraw-to-image \"C:\\\\Users\\\\julie\\\\Mon Drive\\\\MATHS Prepa\\\\Supérieur\\\\Design PM\\\\Core Technical Features\\\\modele_de_donnee.excalidraw.md\" -o \"/tmp/modele_donnee.png\")",
+      "Bash(excalidraw-to-image \"C:/tmp/modele_v5.excalidraw\" -o \"C:/tmp/modele_v5.png\" 2>&1)",
+      "Bash(find:*)",
+      "Bash(excalidraw-to-image:*)",
+      "WebSearch",
+      "WebFetch(domain:radicle.xyz)",
+      "WebFetch(domain:docs.radicle.xyz)",
+      "WebFetch(domain:hackmd.io)"
+    ]
+  }
+}

@@ -1,5 +1,7 @@
-# Design Promethium 
+# Design de PM 
 
-Ceci est un vault Obsidian. 
+## Introduction
+Ce repo est un vault Obsidian qui définit toutes les primitives techniques, spécifications fonctionnelles du projet. 
 
-Il faut avoir le plugin Excalidraw installé 
+## Requirements 
+- Il faut l'extension Excalidraw. 

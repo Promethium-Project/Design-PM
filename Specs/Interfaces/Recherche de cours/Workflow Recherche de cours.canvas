@@ -1,11 +1,11 @@
 {
 	"nodes":[
 		{"id":"d34eb6ba686858c5","type":"file","file":"Supérieur/Design PM/Specs/Interfaces/Recherche de cours/Fiche de Cours.excalidraw.md","x":-677,"y":1080,"width":1440,"height":701},
-		{"id":"5b1c8dda7d7e5671","type":"file","file":"Supérieur/Design PM/Specs/Interfaces/Recherche de cours/Recherche de Cours.excalidraw.md","x":-655,"y":244,"width":1396,"height":646},
+		{"id":"5b1c8dda7d7e5671","type":"file","file":"Supérieur/Design PM/Specs/Interfaces/Recherche de cours/Recherche de Cours.excalidraw.md","x":-655,"y":244,"width":1395,"height":616},
 		{"id":"9479a10ecb10986c","type":"file","file":"Supérieur/Design PM/Specs/Interfaces/Recherche de cours/Système de tag hiérarchique.excalidraw.md","x":-1920,"y":244,"width":960,"height":646},
 		{"id":"6da419b331b6651b","type":"file","file":"Supérieur/Design PM/Specs/Interfaces/Recherche de cours/Fichiers de cours.excalidraw.md","x":-1680,"y":2200,"width":1139,"height":769},
 		{"id":"2d79b7202c7132eb","type":"file","file":"Supérieur/Design PM/Specs/Interfaces/Recherche de cours/Communauté de cours.excalidraw.md","x":640,"y":2200,"width":1287,"height":797},
-		{"id":"113f960599b48d65","type":"text","text":"# Workflow Recherche de Cours","x":-219,"y":0,"width":525,"height":70}
+		{"id":"113f960599b48d65","type":"text","text":"# Workflow ","x":-219,"y":0,"width":525,"height":70}
 	],
 	"edges":[
 		{"id":"f590dd0ebe46b8d1","fromNode":"113f960599b48d65","fromSide":"bottom","toNode":"5b1c8dda7d7e5671","toSide":"top"},
