@@ -153,6 +153,7 @@ Les killer features sont :
 	- Taper l'exercice sur internet et croiser les doigts pour le trouver. C'est chronophage.
 	- Demander à un LLM, mais il ne connait pas le contexte, les connaissances de l'élève, et ça casse fait une cassure dans son workflow.
 
+- **Cahier de Prépa** : UX épouvantable, couche sociale absente. 
 ## 1.3. Cas d'usage principaux 
 
 - Partage rapide entre étudiants au sein de groupes de travail. 
@@ -205,11 +206,11 @@ Il est à la fois compétiteur (le classement compte) et conscient que la coopé
   - Il a au moins une interaction productive avec un camarade à chaque session de travail.
   - Il passe moins de 5 minutes par session à s'organiser (navigation, TODO, recherche de ressource).
 
-
-
 ### 2.1.2 Professeur 
 
-C'est le profil qui a le plus grand levier de croissance pour ce projet : convaincre un professeur de premier plan d'utiliser l'outil pour son cours est une nécessité. 
+_Peut être à affiner pour recueillir de vrai retours_
+
+**C'est le profil qui a le plus grand levier de croissance pour ce projet : convaincre un professeur de premier plan d'utiliser l'outil pour son cours est une nécessité. **
 
 Un professeur a constitué au fil des années un corpus de TDs et d'exercices dont il est fier. Il adapte son cours chaque année à sa classe, mais cette adaptation repose sur son intuition — il sait que certains exercices font progresser, d'autres pas, mais n'a pas de données pour le valider. Il est **méfiant** vis-à-vis du partage de ses ressources, qu'il considère comme un **avantage concurrentiel pour ses élèves**.
 
@@ -227,11 +228,11 @@ Un professeur a constitué au fil des années un corpus de TDs et d'exercices do
 système actuel.
 
 **Valeur attendue de PM :**
+- Il attend un système modulaire sur lequel il peut partager des fichiers. 
 - Des analytics granulaires sur l'usage de son cours : temps passé par section, taux de réussite par exercice, ordre empiriquement optimal.
 - Un flux de retours structurés de ses élèves (questions ancrées dans le document, errata proposés formellement).
 - Un système de versioning de ses ressources : commits pour affiner son cours, PRs pour intégrer les contributions de ses élèves (exercices d'oraux, corrections alternatives).
-- Un échange mutuellement avantageux : partager ses ressources lui donne accès à des données qu'il n'aurait jamais pu
-collecter seul.
+- Un échange mutuellement avantageux : partager ses ressources lui donne accès à des données qu'il n'aurait jamais pu collecter seul.
 
 **Critères de succès :**
 - Il peut identifier en moins de 10 minutes les passages les plus bloquants d'un TD après une session de travail de sa classe.
@@ -239,6 +240,8 @@ collecter seul.
 - Il perçoit la valeur du partage supérieure à la valeur de la rétention.
 
 ## 2.2. User journeys
+
+Le paragraphe qui suit vise à décrire de manière exhaustive toute les user stories liées à PM. 
 
 ### 2.2.1 Un utilisateur qui travaille sur son propre cours 
 - OCR / Upload de PDF [[Supérieur/Design PM/Features/Gestion de l'OCR]]
@@ -248,6 +251,74 @@ collecter seul.
 - Ajoute un erratum
 - Création de deck Anki / partage...
 - Son temps a été tracké, il a un hoverlay pour voir sur le cours où est-ce qu'il a le plus trainé, et ça peut influer directement ses recommandations de cartes sur Anki
+
+### 2.2.1 Un utilisateur qui travaille sur un cours
+
+**Contexte :** L'élève veut travailler le chapitre d'intégration de son cours de maths. Il dispose d'un PDF distribué par son prof et de notes manuscrites prises en cours.
+
+#### 2.2.1.1 Import du cours 
+[[Features/Gestion de l'OCR]]
+[[Features/Etude de PDF]]
+
+Il y a plusieurs possibilités : 
+- Soit son prof est un utilisateur de PM. Il peut utiliser l'onglet de recherche de repos pour aller cloner le repo du prof (logique git abstraite en pratique). 
+- Soit son prof dispose d'un autre service, l'élève dispose donc du cours en PDF. Il peut le drag and drop dans son workspace dans un dossier qu'il a crée spécialement pour ça. Ce dossier pourra être partagés avec d'autres personnes dans le cas où les élèves décident d'utiliser la plateforme
+- Si l'élève dispose de note de cours. Ils peut les scanner avec l'appli mobile. L'artefact arrive directement dans une sandbox sur son espace. On commence en png, est calculé en arrière plan une couche svg, et une couche OCR pour lui permettre une édition multimodale. 
+	- Ctrl F instant grâce à l'OCR 
+	- Modification visuelle de ses schémas grâce à la couche vectorisée (si on abandonne la couche png)
+	- Mapping automatique entre PDF et note manuscrite s'il dispose des 2. 
+- Si les notes ont été réalisée sur une app Ipad upload seamless également si ça été fait avec l'appli PM (mais éventuellement tenter de se greffer à de l'existant). 
+#### 2.2.1.2 Lecture avec overlays
+[[Features/variables]]
+[[Features/Intégration de LLM à l'interface]]
+
+- Il ouvre le PDF en vue **split-screen** : cours à gauche, zone de notes à droite.
+- En survolant une variable (ex. `μ`), un overlay compact apparaît avec sa définition et la position dans le cours où elle a été introduite pour la première fois.
+	- Cette feature est plus difficile à intégrer avec un format png par exemple mais possible. 
+- Sur les passages qui citent un résultat externe (théorème, référence), une icône lui permet d'ouvrir la source dans un nouvel onglet ou de demander une explication contextuelle au LLM — le prompt est automatiquement enrichi avec ses notes et son avancement dans le cours.
+
+#### 2.2.1.3 Annotations personnelles
+[[Core Technical Features/Mapping]]
+
+- Il sélectionne un passage difficile et crée une note ancrée à cet endroit précis. La note apparaît en marginalia lors des révisions.
+- Il peut basculer en vue **marginalia** (cours à 70%, annotations à droite alignées sur les passages) pour relire en voyant ses notes en contexte.
+- Ses annotations restent dans son namespace personnel — invisibles par défaut pour les autres membres de sa guilde. Il peut décider des les share, ie donner la visibilité à ses amis, membres de guildes, publiquements. Fonctionnalité pour share en bulk (share en bulk except some). Ca ce sont bien des features natives (car liée aux protocol Heartwood on choisit le type d'object, on choisit des NID (la couche applicative classe les NID))
+
+#### 2.2.1.4 Questions ancrées 
+[[Features/Gestion des questions]]
+
+- Il ne comprend pas un passage. Il le sélectionne et ouvre la zone sociale associé du document. 
+	- Cette zone est une liste de thread ancrée avec un mapping sur le document. 
+	- Donc quand il scroll dans le document, le tri des threads évoluent selon le critère d(ancrage, current_position). 
+
+- Si sa question est nouvelle, il créer un nouveau thread, qu'il ancre au bon endroit du cours. Les élèves + le profs peuvent y répondre. A noter que les privacy settings de ces artefacts sociaux ne peuvent pas être différents de ceux originaux. C'est une feature imposée par le mapping. 
+
+#### 2.2.1.5 Erratum 
+[[Features/Gestion des erratums]]
+
+- Il repère une erreur dans le cours (coquille, signe manquant) : plusieurs possibilités : 
+	- Le cours est dans un format qui peut-être éditer sans problème (md, latex...) il passe en mode edit et corrige la coquille. Il peut faire l'équivalent d'une PR. 
+	- Le cours est dans un format qui ne peut pas être edit facilement. Il fait un mapping. L'anchor sur le cours est en overlay (donc c'est vraiment un remplacement). Cet anchor est lié à une note type issue, donc le début contient le texte de remplacement, et la seconde partie l'explication. L'ensemble des issues est visible.
+
+-  Dans tous les cas ces mappings particuliés sont visibles dans la partie issues du repo, et en overlay, l'interface les mets d'autant plus en avant qu'un grand nombre d'utilisateur accepte l'issue. (Overlay rouge de plus en plus fort)
+
+#### 2.2.1.6 Création de deck Anki 
+[[Features/Création de decks Anki]]
+[[Features/Anki + Analytics]]
+
+- L'élève peut décider 
+
+#### 2.2.1.7 Fin de session 
+[[Features/Time tracker]]
+
+- En fermant le cours, PM lui affiche un résumé de session : temps passé par section, heatmap des passages où il a le
+plus traîné.
+- Les sections sur lesquelles il a passé le plus de temps sans poser d'ancre ni créer de carte remontent en priorité
+dans ses recommandations Anki.
+- Le time tracker compare sa session à la médiane des élèves ayant le même profil de progression sur ce cours.
+
+
+
 ### 2.2.2 Un utilisateur qui travaille sur un poly d'exercice 
 - Son parcours est recommandé
 - Il peut poser des questions
